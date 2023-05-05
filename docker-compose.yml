@@ -1,0 +1,39 @@
+version: '3.9'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: khaledhisham
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: khaled
+      RABBITMQ_DEFAULT_PASS: password
+  sender:
+    build: .
+    image: rabbitmq-khaled/khaled-rabbitmq-spring
+    environment:
+      SPRINGBOOT_PORT: 8080
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: khaled
+      RABBITMQ_PASSWORD: password
+      SPRINGBOOT_PROFILES: production,sender
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+  receiver:
+    build: .
+    image: rabbitmq-khaled/khaled-rabbitmq-spring
+    environment:
+      SPRINGBOOT_PORT: 8080
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: khaled
+      RABBITMQ_PASSWORD: password
+      SPRINGBOOT_PROFILES: production,receiver
+    ports:
+      - "8081:8080"
+    depends_on:
+      - sender
